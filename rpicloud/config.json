@@ -1,0 +1,40 @@
+{
+	"debug_mode": true,
+	"log_path": "./log",
+	"html_path": "html",
+	"port": {
+		"ws": 9090,
+		"http": 9080,
+		"base": 43210,
+		"tcp": 1,
+		"unused": 0
+	},
+	"http_port": 9999,
+	"express_restful_port": 9998,
+	"tcp_port": 9997,
+	"udp_port": 9996,
+	"ws_port": 8980,
+	"test":"test",
+	"cloudcmd": {           
+    "prefix": "/cloudcmd", 
+    "auth"              : true,  
+    "username"          : "admin", 
+    "password"          : "admin-pass", 
+    "algo"              : "sha512WithRSAEncryption", 
+    "editor"            : "edward", 
+    "diff"              : true,    
+    "zip"               : true,   
+    "notifications"     : false, 
+    "localStorage"      : true, 
+    "buffer"            : true,  
+    "dirStorage"        : true,  
+    "minify"            : false, 
+    "online"            : true,  
+    "cache"             : true,  
+    "showKeysPanel"     : true,  
+    "ip"                : null,   
+		"port":9990,
+    "progress"          : true,   
+    "htmlDialogs"       : false  
+    }
+}

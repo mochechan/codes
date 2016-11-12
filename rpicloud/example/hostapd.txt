@@ -1,0 +1,11 @@
+http://blog.itist.tw/2014/05/hotspotd.html
+
+sudo iptables -F
+sudo iptables -F -t nat
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+sudo bash -c 'iptables-save > /etc/network/iptables'
+sudo iptables-restore < /etc/network/iptables
+
+

@@ -1,0 +1,37 @@
+{
+  "name": "raspberrypicloud",
+  "description": "Raspberry PI Cloud",
+  "version": "0.0.1-dev",
+  "private": true,
+  "scripts": {
+    "start": "nodejs starter.js",
+    "verbose": "nodejs starter.js",
+    "test": "rm -Rfv log/*; node test.js",
+    "postinstall": "mkdir -pv log; cd node_modules/sesh/; npm install eyes; cd ../ipfs-kad-router/; npm install peer-info peer-id multiaddr"
+  },
+  "author": {
+    "name": "Mo-Che Chan",
+    "email": "chan@alumni.ncu.edu.tw"
+  },
+  "keywords": [
+    "IoT",
+    "Raspberry PI",
+    "cloud"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mochechan/rpicloud.git"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "eyes": "^0.1.8",
+    "formidable": "^1.0.17",
+    "sesh": "^0.1.0",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "4.4.3",
+    "npm": ""
+  }
+}

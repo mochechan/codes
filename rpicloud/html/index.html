@@ -1,0 +1,87 @@
+<!doctype html>
+<html><head> <script src="js/rpicloud.js">
+R.config({
+	
+});
+</script> </head><body lang="en">
+<h1>RPI cloud demo</h1>
+
+<div id="first" class="box">
+  <form><input autocomplete="off" value="Type here..."></input></form>
+</div>
+</br>
+
+<strong id="test_button" onclick="rpicloudtest('test')">TEST</strong> </br>
+
+<textarea id="chat-content" style="width:400px;height:200px">asdf</textarea><br/>
+
+  <input type="text" id="username" name="" value="" placeholder="Choose username"/>
+  <input type="text" id="message" name="" value="" placeholder="Enter chat message"/>
+  <input type="button" id="send" name="" value="Send" onclick="sendMessage()"/>
+    </br>
+
+<strong id="test01" onclick="test01('t')">TEST01 R.emit();</strong> </br>
+<strong id="test02" onclick="test02('t')">TEST02 restful login </strong> </br>
+<strong id="test03" onclick="test03('t')">TEST03 restful logout </strong> </br>
+
+<script>
+function sendMessage(){
+	//R.emit('exec', );
+}
+
+/////////////////////// use rpicloud
+	//R.on('ws_onmessage', function(){ console.log(arguments); });
+	//R.ws_send("exec {'command':'pwd'}", function(){ console.log("return by ws_send"); });
+	//R.command("exec");
+	//console.log(R);
+
+	R.emit("exec", {"command":"ls"}, function(){
+		console.log("exec callback arguments");
+		console.log(arguments);
+	});
+
+	R.log("testing log" );
+
+	R.on("ws_onmessage", function () {
+		console.log("R.on ws_onmessage callback");
+		console.log(arguments);
+	});
+
+var test01 = function (d) {
+	R.emit("parse_command", {"command":"demo1", test:"test01", others:{}, function(){
+		console.log("exec callback arguments");
+		console.log(arguments);
+	}});
+}
+
+var test02 = function(arg) {
+	//console.log(window.location);
+		console.log(arg);
+		var x = window.location.protocol + '//' + window.location.hostname + ':3000' + '/';
+		console.log(x);
+		$.getJSON('user_status', {
+		  user: 'value',
+		  pass: 'otherValue'
+		}, function(data){
+			 // Handles the callback when the data returns
+			console.log("data");
+			console.log(data);
+		});
+}
+
+var test03 = function(arg) {
+	//console.log(window.location);
+		console.log(arg);
+		var x = window.location.protocol + '//' + window.location.hostname + ':3000' + '/';
+		console.log(x);
+		$.getJSON('user_logout', { }, function(data){
+			 // Handles the callback when the data returns
+			console.log("data");
+			console.log(data);
+		});
+}
+
+
+</script>
+</body></html>
+
