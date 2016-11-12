@@ -2,10 +2,11 @@
 echo This script installs some necessary packages for my raspberry pi 2.
 
 echo Installing docker
-curl -sSL https://get.docker.com | sh
-sudo usermod -aG docker pi
+#curl -sSL https://get.docker.com | sh
+#sudo usermod -aG docker pi
 
 
+cd ~
 
 echo This rpi2 has a rpi camera.
 git clone git@github.com:131/h264-live-player.git ~/h264-live-player
