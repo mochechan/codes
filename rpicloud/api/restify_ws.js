@@ -7,10 +7,19 @@ const restify = require('restify');
 const WebSocket = require('ws').Server;
 
 
+var log, _rc;
+
+exports.http_server_start = function () {
+	if (typeof(arguments[0]._rc) === 'object' && typeof(arguments[0]._rc.log) === 'function') {
+		_rc = arguments[0]._rc;
+		log = arguments[0]._rc.log;
+	} else log = console.log;
+
 var server = restify.createServer({ version: '1.0.0' });
 server.use(restify.gzipResponse());
 server.use(restify.bodyParser());
 var ws = new WebSocket({server: server});
+var ws_clients = {}; //all clients for ws
 
 
 server.get(/\/html\/?.*/, restify.serveStatic({directory: path.resolve(__dirname, '..')}));
@@ -40,11 +49,31 @@ ws.on('connection', function connection(s) {
 	console.log("ws connection...");
 
   s.on('message', function incoming(message) {
+		log("ws received: " );
+		console.log(message);
 
     console.log(`ws received: ${message}`);
-    s.send(JSON.stringify({
-      answer: 42
-    }));
+
+		//FIXME: try catch
+		var parsed = JSON.parse(message);
+
+		var payload = parsed.payload;
+
+		payload.callback = function(api_result){
+				log("ws callback: ");
+				log(api_result);
+				//console.log("conn.send:");
+				//console.log(api_result);
+				var payload_result = {
+					result: api_result,
+					transaction_id: parsed.transaction_id,
+				};
+	    	conn.send(JSON.stringify(api_result));
+			};
+		console.log(typeof payload);
+
+		_rc.call_api(payload);
+    //s.send(JSON.stringify({ answer: 42 }));
   });
 });
 
@@ -69,13 +98,5 @@ ws.on('close', function close() {
   console.log('ws on close');
 });
  
-ws.on('message', function message(data, flags) {
-	console.log('ws on message');
-  console.log('Roundtrip time: ' + (Date.now() - parseInt(data)) + 'ms', flags);
- 
-  //setTimeout(function timeout() {
-  //  ws.send(Date.now().toString(), {mask: true});
-  //}, 500);
-});
 
-
+}

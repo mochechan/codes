@@ -1,6 +1,6 @@
 /* rpicloud browser-side javascript API 
 support:
-* R.ws({ws_url: ws://window.location.host});
+* R.ws({host: ws://window.location.host});
 * R.emit("exec", {"command","ls", function() {}});
 * R.emit("handler", {"handler","ls", function() {}});
 * R.on("ws_onmessage", function () {});
@@ -9,54 +9,24 @@ todo:
 * R.logout({});
 * R.get();
 * R.post();
+* avoid to require another js
 */
-
-var config = {
-			ws_port: 9090,
-			ws_ip: window.location.hostname,
-			ws_connected: false,
-			logined: false,
-		};
-
-/////////////////////////////////// start of requiring another js
-// $.getScript("my_lovely_script.js", function(){ alert("Script loaded but not necessarily executed."); });
-
-function require_js(js) {
-	//console.log("requiring: " + js);
-	document.write('<script type="text/javascript" src="' + js + '"></script>');
-}
-
-if (!window.jQuery) {
-	//require_js("http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
-	require_js("https://code.jquery.com/jquery-3.1.1.min.js");
-}
-
-//require_js("http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
-//require_js("http://cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js");
-require_js("./js/shared_utility.js");
-//console.log(this);
-
-//setTimeout(function(){
-	//FIXME: sometimes trouble
-	//console.log(shared_utility.test());
-//},220);
-
-//require_js("http://cdn.peerjs.com/0.3.14/peer.min.js"); //http://peerjs.com/
-//https://code.google.com/p/crypto-js/
-//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"); 
-//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"); 
-//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"); 
-//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha3.js"); 
-
-/////////////////////////////////// end of requiring another js
 
 
 //////////////////////////////// global R for RPI cloud
 var R = (typeof module === 'undefined' ? {} : module.exports);
 
 (function (exports, global) {
-	R = {status: {}, callback_pool:{}, config: config };
-	console.log("in function() R.config"); 
+
+	var config = {
+			ws_port: 9090,
+			ws_ip: window.location.hostname,
+			ws_connected: false,
+			logined: false,
+	};
+
+	R = {status: {ws_opened: false, }, callback_pool:{}, config: config };
+	//console.log("in function() R.config"); 
 
 	//////////////////////////////// start of utility functions
 
@@ -104,20 +74,26 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 
 	// http://www.html5rocks.com/en/tutorials/websockets/basics/?redirect_from_locale=tw
 
+	var ws_sent = {};
 	var ws_client;
 
-	R.ws = function(args){
-		var ws_url = 'ws://' + R.config.ws_ip + ':' + R.config.ws_port + '';
-		//console.log('ws_url: ' + ws_url);
-		ws_client = new WebSocket("ws://" + args.ws_host, []);
+	var default_cb = function(){
+		console.log("no given callback");
+		console.log(arguments);
+	}
 
+
+	R.ws = function(args){
+		//to create a new websocket 
+		//console.log(args);
+		var ws_url = 'ws://' + args.host + '/echo';
+		console.log('ws_url: ' + ws_url);
+		ws_client = new WebSocket(ws_url, ['soap','xmpp']);
 
 		ws_client.onopen = function () {
 			R.status.ws_opened = true;
-			console.log("ws_client.onopen");
+			//console.log("ws_client.onopen");
 			//console.log(arguments);
-  		//ws_client.send('exec {"command":"ls"}'); 
-			//if(R_on['ws_onopen'] && typeof(R_on['ws_onopen']) === 'function') R_on.ws_onopen(arguments);
 		};
 
 		ws_client.onerror = function (error) {
@@ -125,6 +101,7 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
   		console.log('WebSocket Error ' + error);
 		  console.log(arguments);
 		};
+
 
 		// messages from the server
 		ws_client.onmessage = function () {
@@ -139,20 +116,22 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 				return;
 			}
 	
-			if (!parsed || !parsed.R_metadata || !parsed.R_metadata.transaction_id) {
+			if (!parsed || !parsed.transaction_id) {
 				//console.log("The received message cannot be parsed to JSON.");
 				return;
 			}
 
-			if( R.callback_pool[parsed.R_metadata.transaction_id] && typeof(R.callback_pool[parsed.R_metadata.transaction_id].callback) === 'function') {
-				R.callback_pool[parsed.R_metadata.transaction_id].callback(parsed);
-				if (R.callback_pool[parsed.R_metadata.transaction_id].trigger_once === true) {
-					delete R.callback_pool[parsed.R_metadata.transaction_id];
-					console.log("release callback id: " + parsed.R_metadata.transaction_id);
-				}
+			if (!parsed.transaction_id) {
+				console.log("The received message has no transaction_id.");
 				return;
-			} else if (R.callback_pool["ws_onmessage"] && typeof(R.callback_pool["ws_onmessage"].callback) === 'function') {
-				R.callback_pool["ws_onmessage"].callback(parsed);
+			}
+
+			if(ws_sent[parsed.transaction_id] && typeof(ws.sent[parsed.transaction_id].callback) === 'function') {
+				ws_sent[parsed.transaction_id].callback(parsed);
+				delete ws_sent[parsed.transaction_id];
+				return;
+			} else {
+				//todo: checkout R.on()
 			}
 		};//end of ws_client.onmessage
 
@@ -187,6 +166,7 @@ console.log(connection.extensions);
 }; 
 	///////////////////////////// end of ws websocket client
 
+
 	R.on = function() {
 			switch (arguments[0]) {
 				case "ws_onmessage":
@@ -201,45 +181,51 @@ console.log(connection.extensions);
 			}
 		};
 
-	R.emit = function(api_name, args) {
+	var ws_not_yet_send = [];
+
+	R.emit = function(args, callback) {
 			console.log("In R.emit");
 			console.log(arguments);
-			var transaction_id = guid();
-			console.log("api_name: " + api_name);
-			console.log("transaction_id " + transaction_id);
 
-			if(R.callback_pool && R.callback_pool[transaction_id]){
-				console.log("invalid transaction_id: " + transaction_id);
-				return;
-			}
-
-			R.callback_pool[transaction_id] = {
-				trigger_once: true, 
-				transaction_id: transaction_id, 
-				callback: args.callback
+			var msg = {
+				payload: args, 
+				transaction_id: guid(),
 			};
 
-			args.R_metadata = {transaction_id: transaction_id};
-			var msg = api_name + ' ' + JSON.stringify(args);
-			console.log("calling api: " + msg);
-			//setTimeout(function(){
-				ws_client.send(msg);
-			//}, 500);
+			if(R.status.ws_opened === true){
+				console.log("ws_client sending" + JSON.stringify(msg));
+				ws_client.send(JSON.stringify(msg));
+				ws_sent[msg.transaction_id] = [msg, callback || default_cb];
+
+			} else if(R.status.ws_opened === false){
+				console.log("pushing");
+				console.log([msg, callback || default_cb]);
+				ws_not_yet_send.push([msg, callback || default_cb]);
+
+				setTimeout(function(){
+					if(ws_not_yet_send.length > 0){
+						var pop = ws_not_yet_send.pop();
+						console.log("pop");
+						console.log(pop);
+						R.emit(pop[0].payload, pop[1]);
+					}
+				},1000);
+			} else {
+				console.log("R internal error.");
+			}
 	};
 
 	R.log = function(msg){
 		if(typeof msg === 'string'){
-			//if(R.status.)
-			var m = {msg: msg};
-			ws_client.send('log ' + JSON.stringify(m));
+			var m = {api: 'log', msg: msg};
+			R.emit(JSON.stringify(m));
 		} else {
-			console.log("invalid log input");
+			console.log("invalid log input, string only");
 		}
-
 	};
 
 	
-	console.log("End of R loading");
+	//console.log("End of R loading");
 
 })('object' === typeof module ? module.exports : (this.R = {}), this);
 

@@ -1,13 +1,18 @@
+/* customizable raspberry pi cloud 
+
+*/
+
 "use strict";
 
 
-var rc = function rc () {
+var rc = function () {
 
 	var that = this;
 	that.status = {dirname: __dirname, filename: __filename, };
-	that.verbose = arguments[0].verbose || false;
 	that.config = require('./config.json');
+	that.verbose = arguments[0].verbose || that.config.verbose || false;
 	that.config.package = require('./package.json');
+
 	that.node = {
 		events: require('events'), 
 		fs: require('fs'), 
@@ -18,6 +23,7 @@ var rc = function rc () {
 		//requirejs: require('requirejs'), 
 		//eventemitter2: require('eventemitter2').EventEmitter2,
 	};
+
 	//that.npm.requirejs.config({baseUrl: __dirname , nodeRequire: require});
 
 	//that.shared_utility = require('./html/js/shared_utility.js');
@@ -113,6 +119,8 @@ rc.prototype.list_api = function () {
 
 
 rc.prototype.call_api = function (api_call) {
+	console.log("In call_api");
+	console.log(api_call);
 
 	var that = this;
 	if (typeof(api_call) === 'undefined') {
@@ -120,11 +128,16 @@ rc.prototype.call_api = function (api_call) {
 		return;
 	}
 
-	var api_name = api_call.api_name;
+	if (typeof(api_call) != 'object') {
+		that.log("ERROR: API call requires an object input. " + typeof(api_call));
+		return;
+	}
+
+	var api_name = api_call.api_name || api_call.api;
 	var api_args = api_call.api_args;
 
 	if (typeof(api_name) != 'string') {
-		that.log("ERROR: The given api_name is not a string.");
+		that.log("ERROR: The given api_name is not a string. " + typeof(api_name));
 		return;
 	}
 

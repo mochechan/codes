@@ -1,0 +1,32 @@
+
+/////////////////////////////////// start of requiring another js
+// $.getScript("my_lovely_script.js", function(){ alert("Script loaded but not necessarily executed."); });
+
+function require_js(js) {
+	//console.log("requiring: " + js);
+	document.write('<script type="text/javascript" src="' + js + '"></script>');
+}
+
+if (!window.jQuery) {
+	//require_js("http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
+	require_js("https://code.jquery.com/jquery-3.1.1.min.js");
+}
+
+//require_js("http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
+//require_js("http://cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js");
+require_js("./js/shared_utility.js");
+//console.log(this);
+
+//setTimeout(function(){
+	//FIXME: sometimes trouble
+	//console.log(shared_utility.test());
+//},220);
+
+//require_js("http://cdn.peerjs.com/0.3.14/peer.min.js"); //http://peerjs.com/
+//https://code.google.com/p/crypto-js/
+//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"); 
+//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"); 
+//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"); 
+//require_js("http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha3.js"); 
+
+/////////////////////////////////// end of requiring another js
