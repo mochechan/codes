@@ -134,7 +134,7 @@ rc.prototype.call_api = function (api_call) {
 	}
 
 	var api_name = api_call.api_name || api_call.api;
-	var api_args = api_call.api_args;
+	var api_args = api_call.api_args || api_call.args || api_call;
 
 	if (typeof(api_name) != 'string') {
 		that.log("ERROR: The given api_name is not a string. " + typeof(api_name));

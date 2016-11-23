@@ -25,7 +25,15 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 			logined: false,
 	};
 
-	R = {status: {ws_opened: false, }, callback_pool:{}, config: config };
+	R = {
+		status: {
+			ws_opened: false, 
+			ws_sent: {},
+		}, 
+		callback_pool:{}, 
+		config: config 
+	};
+
 	//console.log("in function() R.config"); 
 
 	//////////////////////////////// start of utility functions
@@ -74,7 +82,7 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 
 	// http://www.html5rocks.com/en/tutorials/websockets/basics/?redirect_from_locale=tw
 
-	var ws_sent = {};
+	var ws_sent = R.status.ws_sent;
 	var ws_client;
 
 	var default_cb = function(){
@@ -115,9 +123,12 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 				console.log(error);
 				return;
 			}
+			console.log("parsed");
+			console.log(parsed);
+			console.log(ws_sent);
 	
 			if (!parsed || !parsed.transaction_id) {
-				//console.log("The received message cannot be parsed to JSON.");
+				console.log("The received message cannot be parsed to JSON.");
 				return;
 			}
 
@@ -126,8 +137,9 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 				return;
 			}
 
-			if(ws_sent[parsed.transaction_id] && typeof(ws.sent[parsed.transaction_id].callback) === 'function') {
-				ws_sent[parsed.transaction_id].callback(parsed);
+			if(ws_sent[parsed.transaction_id] && typeof(ws_sent[parsed.transaction_id].callback) === 'function') {
+				console.log("trigger callback");
+				ws_sent[parsed.transaction_id].callback(parsed.result);
 				delete ws_sent[parsed.transaction_id];
 				return;
 			} else {
@@ -184,8 +196,8 @@ console.log(connection.extensions);
 	var ws_not_yet_send = [];
 
 	R.emit = function(args, callback) {
-			console.log("In R.emit");
-			console.log(arguments);
+			//console.log("In R.emit");
+			//console.log(arguments);
 
 			var msg = {
 				payload: args, 
@@ -195,21 +207,27 @@ console.log(connection.extensions);
 			if(R.status.ws_opened === true){
 				console.log("ws_client sending" + JSON.stringify(msg));
 				ws_client.send(JSON.stringify(msg));
-				ws_sent[msg.transaction_id] = [msg, callback || default_cb];
+				ws_sent[msg.transaction_id] = {
+					payload: args, 
+					callback: callback, 
+					transaction_id: msg.transaction_id
+				};
 
 			} else if(R.status.ws_opened === false){
-				console.log("pushing");
-				console.log([msg, callback || default_cb]);
-				ws_not_yet_send.push([msg, callback || default_cb]);
+				//console.log("pushing");
+				//console.log([msg, callback]);
+				if(typeof(callback) === 'function'){
+					ws_not_yet_send.push([msg, callback]);
+				}
 
 				setTimeout(function(){
 					if(ws_not_yet_send.length > 0){
 						var pop = ws_not_yet_send.pop();
-						console.log("pop");
-						console.log(pop);
+						//console.log("pop");
+						//console.log(pop);
 						R.emit(pop[0].payload, pop[1]);
 					}
-				},1000);
+				}, 777);
 			} else {
 				console.log("R internal error.");
 			}

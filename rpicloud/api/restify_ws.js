@@ -9,7 +9,7 @@ const WebSocket = require('ws').Server;
 
 var log, _rc;
 
-exports.http_server_start = function () {
+exports.restify_server_start = function () {
 	if (typeof(arguments[0]._rc) === 'object' && typeof(arguments[0]._rc.log) === 'function') {
 		_rc = arguments[0]._rc;
 		log = arguments[0]._rc.log;
@@ -47,6 +47,7 @@ server.listen(9999, function() {
 
 ws.on('connection', function connection(s) {
 	console.log("ws connection...");
+	ws_clients[s.id] = s;
 
   s.on('message', function incoming(message) {
 		log("ws received: " );
@@ -59,18 +60,17 @@ ws.on('connection', function connection(s) {
 
 		var payload = parsed.payload;
 
-		payload.callback = function(api_result){
+		payload.callback = function(){
 				log("ws callback: ");
-				log(api_result);
-				//console.log("conn.send:");
-				//console.log(api_result);
+				log(arguments);
 				var payload_result = {
-					result: api_result,
+					result: arguments,
 					transaction_id: parsed.transaction_id,
 				};
-	    	conn.send(JSON.stringify(api_result));
+	    	log("ws sending:" + JSON.stringify(payload_result));
+	    	s.send(JSON.stringify(payload_result));
 			};
-		console.log(typeof payload);
+		console.log(typeof(payload));
 
 		_rc.call_api(payload);
     //s.send(JSON.stringify({ answer: 42 }));
