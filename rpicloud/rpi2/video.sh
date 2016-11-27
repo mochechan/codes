@@ -2,7 +2,7 @@
 # http://raspberrypi.stackexchange.com/questions/7446/how-can-i-stream-h-264-video-from-the-raspberry-pi-camera-module-via-a-web-serve
 
 
-base="/data/live"
+base="/home/pi/video"
 
 cd $base
 

@@ -5,4 +5,6 @@ git clone git://source.ffmpeg.org/ffmpeg.git
 cd ffmpeg
 ./configure
 make 
-make install 
+sudo make install 
+
+

@@ -1,9 +1,11 @@
 #!/bin/bash
 echo This script installs some necessary packages for my raspberry pi 2.
 
-echo Installing docker
-curl -sSL https://get.docker.com | sh
-sudo usermod -aG docker pi
+sudo apt -y install vim htop
+
+#echo Installing docker
+#curl -sSL https://get.docker.com | sh
+#sudo usermod -aG docker pi
 
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt -y install nodejs
@@ -13,6 +15,7 @@ cd ~
 echo This rpi2 has a rpi camera.
 git clone https://github.com/131/h264-live-player.git ~/h264-live-player
 cd ~/h264-live-player
+npm install 
 
 
 # https://learn.adafruit.com/dht-humidity-sensing-on-raspberry-pi-with-gdocs-logging?view=all
@@ -28,4 +31,7 @@ echo This rpi2 has a lirc receiver.
 
 
 echo This rpi2 has a lirc emitter.
+
+
+
 
