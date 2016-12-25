@@ -6,6 +6,9 @@
 
 
 var rc = function () {
+	if(process.version != 'v6.9.1'){
+		console.log("WARN: nodejs shoud be >= v6.9.1");
+	}
 
 	var that = this;
 	that.status = {dirname: __dirname, filename: __filename, };
@@ -18,7 +21,9 @@ var rc = function () {
 		fs: require('fs'), 
 		path: require('path'), 
 		os: require('os'), 
+		url: require('url'),
 	};
+
 	that.npm = {
 		//requirejs: require('requirejs'), 
 		//eventemitter2: require('eventemitter2').EventEmitter2,
@@ -113,14 +118,16 @@ var rc = function () {
 
 rc.prototype.list_api = function () {
 	var api_list = [];
-	for (var i in this.api) api_list.push(i);
+	for(var i in this.api){ 
+		api_list.push(i);
+	}
 	return api_list;
 }
 
 
 rc.prototype.call_api = function (api_call) {
-	console.log("In call_api");
-	console.log(api_call);
+	//console.log("In call_api");
+	//console.log(api_call);
 
 	var that = this;
 	if (typeof(api_call) === 'undefined') {
