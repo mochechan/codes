@@ -4,8 +4,8 @@
   "version": "0.0.1-dev",
   "private": true,
   "scripts": {
-    "start": "nodejs starter.js",
-    "verbose": "nodejs starter.js",
+    "start": "node starter.js",
+    "verbose": "node starter.js",
     "test": "rm -Rfv log/*; node test.js",
     "postinstall": "mkdir -pv log; node -v"
   },

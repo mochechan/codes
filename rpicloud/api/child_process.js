@@ -212,8 +212,6 @@ module.exports = {
 			log = arguments[0]._rc.log;
 		} else log = console.log;
 
-
-
 	}
 }
 

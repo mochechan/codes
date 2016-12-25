@@ -20,6 +20,9 @@ R.config({ });
 
 <strong id="test01" onclick="test01('t')">TEST01 R.emit();</strong> </br>
 
+<strong id="h264-live-player" onclick="player('start_video')">start h264-live-player</strong> </br>
+<strong id="h264-live-player" onclick="player('stop_video')">stop h264-live-player</strong> </br>
+
 <script>
 
 	R.ws({host: window.location.host}); //enabling ws
@@ -41,6 +44,12 @@ var test01 = function (d) {
 	});
 }
 
+function player(d){
+	R.emit({"api":d, "command":"h264-live-player", test:"test01", others:{}}, function(result){
+		console.log("exec callback arguments");
+		if(result[0] == "video started") window.location = "http://" + window.location.hostname + ":8080";
+	});
+}
 
 </script>
 </body></html>

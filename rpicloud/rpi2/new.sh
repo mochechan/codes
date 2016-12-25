@@ -1,14 +1,15 @@
 #!/bin/bash
 echo This script installs some necessary packages for my raspberry pi 2.
 
-sudo apt -y install vim htop
 
-#echo Installing docker
+#sudo apt -y install vim htop
+
+#echo Installing docker (not support)
 #curl -sSL https://get.docker.com | sh
 #sudo usermod -aG docker pi
 
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt -y install nodejs
+#curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+#sudo apt -y install nodejs
 
 cd ~
 

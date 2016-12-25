@@ -78,15 +78,9 @@ var timestamp = function () {
 }
 
 
-var log = function log () {
+module.exports = function log(){
 	//console.log("in log function");
 	//console.log(arguments);
-	var that;// = this;
-	if(typeof(this.log_path) === 'undefined'){
-		that = this;
-		that.log_path = path.resolve(__dirname, "..", "log");
-		//console.log("newing log: " + that.log_path );
-	}
 	//console.log("You're calling the existing log.");
 	var st = stacktrace();
 	//console.log(st);
@@ -101,6 +95,15 @@ var log = function log () {
 
 	var date = (timestamp().substr(0,8));
 	var time = (timestamp().substr(8));
+	var that;// = this;
+	if(typeof(this.log_path) === 'undefined'){
+		that = this;
+		that.log_path = path.resolve(__dirname, "..", "log");
+		fs.appendFile(path.resolve(__dirname, that.log_path, date + "all.log"), time + ' ' + caller + ' newing/connecting to log: ' + that.log_path + '\n', function(err){
+			if (err) throw err;
+		});
+	}
+
 	var log_text = " ";
 	if (typeof(arguments[0]) === 'string') {
 		log_text += arguments[0];
@@ -115,15 +118,17 @@ var log = function log () {
 		}
 	}
 
-	fs.appendFile(path.resolve(__dirname, '../log', date + log_file), time + log_text + '\n', function(err){
+	if(typeof(this.log_path) != "string"){
+		return;
+	}
+	fs.appendFile(path.resolve(__dirname, this.log_path, date + log_file), time + log_text + '\n', function(err){
 		if (err) throw err;
 	});
-	fs.appendFile(path.resolve(__dirname, '../log', date + "all.log"), time + ' ' + caller + log_text + '\n', function(err){
+	fs.appendFile(path.resolve(__dirname, this.log_path, date + "all.log"), time + ' ' + caller + log_text + '\n', function(err){
 		if (err) throw err;
 	});
 
 }
 
 
-module.exports = log;
 

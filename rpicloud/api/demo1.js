@@ -6,6 +6,7 @@ module.exports = function demo1() {
 	console.log("This is the demo1 event.");
 	console.log(arguments);
 	console.log(arguments[0].args);
-	if (typeof(arguments[0]) === 'function') arguments[0]("This is a demo event.");
+	var args = arguments[0].args;
 	log("The log works in demo1.");
+	if(typeof args.callback == "function") args.callback("return demo1");
 }

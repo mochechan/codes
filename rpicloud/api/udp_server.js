@@ -9,16 +9,17 @@ var log, _rc;
 var dgram = require('dgram');
 var server = dgram.createSocket('udp4');
 
-module.exports = function () {
+exports.udp_server_start = function (){
 	// to reuse _rc
 	if (typeof(arguments[0]._rc) === 'object' && typeof(arguments[0]._rc.log) === 'function') {
 		log = arguments[0]._rc.log;
 		_rc = arguments[0]._rc;
 	} else log = console.log;
-	log("in udp_server");
-	//log(arguments);
+
+	log("in udp_server start");
+	log(arguments);
 	var args = arguments[0].args || {};
-	//console.log(args);
+	console.log(args);
 
 
 	server.on('listening', function () {

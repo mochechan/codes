@@ -5,7 +5,7 @@
 var log, _rc;
 
 
-exports.list_api = function () {
+exports.list_api = function list_api(){
 	
 	if (typeof(arguments[0]._rc) === 'object' && typeof(arguments[0]._rc.log) === 'function') {
 		log = arguments[0]._rc.log;
@@ -19,7 +19,7 @@ exports.list_api = function () {
 
 
 //input: {api}
-exports.call_api = function () {
+exports.call_api = function call_api(){
 	if (typeof(arguments[0]._rc) === 'object' && typeof(arguments[0]._rc.log) === 'function') {
 		log = arguments[0]._rc.log;
 		_rc = arguments[0]._rc;

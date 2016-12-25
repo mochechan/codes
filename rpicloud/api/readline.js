@@ -31,9 +31,8 @@ module.exports = function readline () {
 			return;
 		}
 		log("readline got: " + command);
-		// standard 20160928
 		_rc.call_api({api_name: 'parse_command', api_args: {command: command}});
-		prompt();
+		//prompt();
 	}).on('close', function() {
   	log('Have a great day!');
 		process.nextTick(function () {
@@ -46,11 +45,13 @@ module.exports = function readline () {
 	}).on('SIGINT', function() {
   	rl.question('You pressed ctrl-c. Are you sure to exit? (y/n)', function(answer) {
     	if (answer.match(/^y(es)?$/i)){ 
-     		rl.pause();
 				_rc.call_api({api_name: "spawn", api_args: {"control":"killall"}});
   	   	log("quitting rpicloud...");
+     		rl.pause();
 				process.nextTick(function(){
-    		 	process.exit(0);
+					setTimeout(function(){
+    		 		process.exit(0);
+					},9);
 				});
     	}
   	});

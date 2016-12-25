@@ -18,27 +18,27 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 
 (function (exports, global) {
 
-	var config = {
-			ws_port: 9090,
-			ws_ip: window.location.hostname,
-			ws_connected: false,
-			logined: false,
-	};
 
 	R = {
 		status: {
 			ws_opened: false, 
 			ws_sent: {},
 		}, 
-		callback_pool:{}, 
-		config: config 
+		callback_pool: {}, 
+		config: {
+			ws_port: 9090,
+			ws_ip: window.location.hostname,
+			ws_connected: false,
+			logined: false,
+			verbose: false,
+		}
 	};
 
 	//console.log("in function() R.config"); 
 
 	//////////////////////////////// start of utility functions
 
-	var timestamp = function () {
+	function timestamp() {
 		var date = new Date();
 
     var hour = date.getHours();
@@ -61,14 +61,14 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
     return year + "" + month + "" + day + "" + hour + "" + min + "" + sec;
 	}
 
-	var guid = function guid() {
+	function guid() {
   	function s4() {
     	return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
   	}
   	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	}
 
-	var short_guid = function guid() {
+	function short_guid() {
   	function s4() {
     	return Math.floor((1 + Math.random()) * 0x10000) .toString(16) .substring(1);
   	}
@@ -95,7 +95,7 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 		//to create a new websocket 
 		//console.log(args);
 		var ws_url = 'ws://' + args.host + '/echo';
-		console.log('ws_url: ' + ws_url);
+		if(R.config.verbose) console.log('ws_url: ' + ws_url);
 		ws_client = new WebSocket(ws_url, ['soap','xmpp']);
 
 		ws_client.onopen = function () {
@@ -113,8 +113,8 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 
 		// messages from the server
 		ws_client.onmessage = function () {
-  		console.log('ws_client.onmessage: ' );
-		  console.log(arguments);
+  		if(R.config.verbose) console.log('ws_client.onmessage: ' );
+		  if(R.config.verbose) console.log(arguments);
 			var received = arguments[0].data;
 			var parsed;
 			try {
@@ -123,9 +123,9 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 				console.log(error);
 				return;
 			}
-			console.log("parsed");
-			console.log(parsed);
-			console.log(ws_sent);
+			if(R.config.verbose) console.log("parsed");
+			if(R.config.verbose) console.log(parsed);
+			if(R.config.verbose) console.log(ws_sent);
 	
 			if (!parsed || !parsed.transaction_id) {
 				console.log("The received message cannot be parsed to JSON.");
@@ -138,7 +138,7 @@ var R = (typeof module === 'undefined' ? {} : module.exports);
 			}
 
 			if(ws_sent[parsed.transaction_id] && typeof(ws_sent[parsed.transaction_id].callback) === 'function') {
-				console.log("trigger callback");
+				if(R.config.verbose) console.log("trigger callback");
 				ws_sent[parsed.transaction_id].callback(parsed.result);
 				delete ws_sent[parsed.transaction_id];
 				return;
@@ -205,7 +205,7 @@ console.log(connection.extensions);
 			};
 
 			if(R.status.ws_opened === true){
-				console.log("ws_client sending" + JSON.stringify(msg));
+				if(R.config.verbose) console.log("ws_client sending" + JSON.stringify(msg));
 				ws_client.send(JSON.stringify(msg));
 				ws_sent[msg.transaction_id] = {
 					payload: args, 

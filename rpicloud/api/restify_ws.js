@@ -35,6 +35,20 @@ exports.restify_server_start = function () {
 	var ws = new WebSocket({server: server});
 	var ws_clients = {}; //all clients for ws
 
+	server.get("/favicon.ico", (req, res, next)=>{
+	  if(err){
+      res.send(500);
+      return next();
+    }
+		log("returning favicon.ico");
+    res.send({
+      code: 200,
+      noEnd: true
+    });
+    //res.write(file);
+    res.end();
+    return next();
+	});
 
 	server.get(/\/html\/?.*/, restify.serveStatic({directory: parameters.html || path.resolve(__dirname, '..')}));
 
@@ -119,3 +133,6 @@ exports.restify_server_start = function () {
 }
 
 
+exports.restify_server_stop = function (){
+
+}

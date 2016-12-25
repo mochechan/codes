@@ -6,8 +6,8 @@
 
 
 var rc = function () {
-	if(process.version != 'v6.9.1'){
-		console.log("WARN: nodejs shoud be >= v6.9.1");
+	if(! /v6.9.*/.test(process.version)){
+		console.log("WARN: nodejs shoud be >= v6.9.1, current: " + process.version);
 	}
 
 	var that = this;
@@ -45,7 +45,7 @@ var rc = function () {
 		}
 		for (var i in arguments[1]) {
 			var filename = arguments[1][i];
-			if (!filename.match(/\.js$/i)) {
+			if (! filename.match(/\.js$/i)) {
 				log("invalid filename: " + filename + ' ');
 				continue;
 			}
@@ -115,6 +115,20 @@ var rc = function () {
 
 }
 
+
+rc.prototype.add_api = function(arg){
+	var api = arg.api || arg.api_name;
+	var callback = arg.callback || arg.cb;
+
+	if(typeof(api) == "string" && typeof(callback) == "function"){
+		if(this.api[api]){
+			this.log("overwriting a existing API: " + api);
+		} else {
+			this.log("adding a new API: " + api);
+		}
+		this.api[api] = callback;
+	};
+}
 
 rc.prototype.list_api = function () {
 	var api_list = [];
