@@ -1,9 +1,8 @@
 <!doctype html>
 <html><head> <script src="js/rpicloud.js">
-
 R.config({ });
-
-</script> </head><body lang="en">
+</script> 
+</head><body lang="en"> 
 <h1>RPI cloud demo</h1>
 <div id="first" class="box">
   <form><input autocomplete="off" value="Type here..."></input></form>
@@ -20,22 +19,26 @@ R.config({ });
 
 <strong id="test01" onclick="test01('t')">TEST01 R.emit();</strong> </br>
 
-<strong id="h264-live-player" onclick="player('start_video')">start h264-live-player</strong> </br>
-<strong id="h264-live-player" onclick="player('stop_video')">stop h264-live-player</strong> </br>
+<strong id="h264-live-player" onclick="player('start_video')">start h264-live-player</strong> </br></br>
+<strong id="h264-live-player_stop" onclick="player('stop_video')">stop h264-live-player</strong> </br></br>
+<strong id="reboot" onclick="player('reboot')">reboot</strong> </br></br>
+<strong id="start_jsmpg" onclick="player('start_jsmpg')">start_jsmpg</strong> </br></br>
+
+<strong id="piface2on_" onclick="piface2('on')">light on</strong> </br></br>
+<strong id="piface2off_" onclick="piface2('off')">light off</strong> </br></br>
 
 <script>
 
-	R.ws({host: window.location.host}); //enabling ws
+console.log("page is loaded0");
 
+	R.ws({host: window.location.host}); //enabling ws
 
 	R.emit({"api":"exec","command":"ls"}, function(){
 		console.log("exec callback arguments");
 		console.log(arguments);
 	});
 
-
 	R.log("testing log" );
-
 
 var test01 = function (d) {
 	R.emit({"api":"parse_command", "command":"demo1", test:"test01", others:{}}, function(){
@@ -44,13 +47,34 @@ var test01 = function (d) {
 	});
 }
 
-function player(d){
+var player = function player(d){
 	R.emit({"api":d, "command":"h264-live-player", test:"test01", others:{}}, function(result){
 		console.log("exec callback arguments");
-		if(result[0] == "video started") window.location = "http://" + window.location.hostname + ":8080";
+		if(result[0] == "video started"){ 
+			setTimeout(function(){
+				window.location = "http://" + window.location.hostname + ":8080";
+			},1000);
+		} else if(result[0] == "jsmpg started"){
+			setTimeout(function(){
+				window.location = "http://" + window.location.host + "/html/jsmpg.html";
+			},1000);
+		}
 	});
 }
 
-</script>
+var piface2 = function piface2(d){
+	if(d == 'on'){
+		R.emit({"api":"piface2", "command":"h264-live-player", on:[0], others:{}}, function(result){
+			console.log("exec callback arguments");
+		});
+	} else {
+		R.emit({"api":"piface2", "command":"h264-live-player", off:[0], others:{}}, function(result){
+			console.log("exec callback arguments");
+		});
+	}
+}
+
+console.log("page is loaded");
+</script> 
 </body></html>
 

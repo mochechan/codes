@@ -86,14 +86,14 @@ var ffmpeg = require('child_process').spawn('ffmpeg',["-s","352x288","-f","video
 	});
 
 
-const restify = require('restify');
+//const restify = require('restify');
 
-var server = restify.createServer({ version: '1.0.0' });
-server.get(/\/html\/?.*/, restify.serveStatic({directory: path.resolve(__dirname, '.')}));
+//var server = restify.createServer({ version: '1.0.0' });
+//server.get(/\/html\/?.*/, restify.serveStatic({directory: path.resolve(__dirname, '.')}));
 
 
-server.listen(8088, function() {
-  console.log('%s listening at %s', server.name, server.url);
-});
+//server.listen(8088, function() {
+  //console.log('%s listening at %s', server.name, server.url);
+//});
 
 
