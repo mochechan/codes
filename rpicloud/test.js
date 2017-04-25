@@ -21,7 +21,11 @@ setTimeout(function(){
 	rc_test.call_api({api: "udp_server", args: {port: 9998, }});
 	rc_test.log("testing rc.log() ");
 	rc_test.call_api({api: "test", args: {"it":"is just a test"}});
+	rc_test.call_api({api: "sivann_ble", args: {"command":"init"}});
 	//console.log(rc_test.list_api());
 }, 399);
 
-
+setTimeout(function(){
+//	rc_test.call_api({api: "sivann_ble", args:{command:"connect",mac_address:"20:c3:8f:f1:a0:82"}});
+//	rc_test.call_api({api: "sivann_ble", args:{command:"connect",mac_address:"20:c3:8f:f1:8f:96"}});
+},9000);

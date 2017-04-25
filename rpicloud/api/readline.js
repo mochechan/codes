@@ -26,9 +26,16 @@ module.exports = function readline () {
 	rl.on('line', function(line) {
 		var command = line.trim();
 		if (command == "") {
-			console.log("Please key in a valid command.");
+			console.log("Please key in a valid command. hint: ? or help ");
 			prompt();
 			return;
+		} else if(command == "?" || command == "help"){
+			var help_string = "(todo) valid command formats are: \n" 
+				+ 'api_name {"command":"string"} \n'
+				+ '{"api_name": "string", "command":"string"} \n'
+				+ '{"api": "string", "command":"string"} \n'
+				+ 'ctrl-C to exit \n';
+			console.log(help_string);
 		}
 		log("readline got: " + command);
 		_rc.call_api({api_name: 'parse_command', api_args: {command: command}});
@@ -48,10 +55,11 @@ module.exports = function readline () {
 				_rc.call_api({api_name: "spawn", api_args: {"control":"killall"}});
   	   	log("quitting rpicloud...");
      		rl.pause();
+  	   	console.log("quitting rpicloud...");
 				process.nextTick(function(){
 					setTimeout(function(){
     		 		process.exit(0);
-					},9);
+					}, 999);
 				});
     	}
   	});

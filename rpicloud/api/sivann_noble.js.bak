@@ -1,0 +1,217 @@
+/*
+	This file is customized noble for sivann hardwares.
+
+.allow(["WeatherStation", "20:c3:8f:f1:8f:96"]);
+
+todo:
+
+exports.noble = function() only
+
+*/
+
+var noble = require('noble');
+var discovered = {};
+var auto = ["20:c3:8f:f1:8f:96","20:c3:8f:f1:a0:82"];
+var log;
+
+module.exports = function(){
+
+	if (typeof(arguments[0]._rc) === 'object' && typeof(arguments[0]._rc.log) === 'function') log = arguments[0]._rc.log;
+	else log = console.log;
+
+	console.log("This is the connect api.");
+	console.log(arguments);
+	console.log(arguments[0].args);
+	var args = arguments[0].args;
+	log("The log works in connect.");
+	if(typeof args.callback == "function") args.callback("return demo1");
+
+	switch(args.command){
+	case 'powerOn': 
+		noble.state = "poweredOn";
+	break;
+	case 'disconnect':
+	break;
+	case 'connect':
+		var macAddress = arguments[0].args.mac_address;
+		connect(macAddress);
+	break;
+	
+
+	case 'listPeripheral':
+		console.log(discovered);
+	break;
+
+	default:
+	break;
+	}
+
+
+}
+
+
+noble.on('stateChange', function(state){
+	console.log("statChange");
+	console.log(arguments);
+  if (state === 'poweredOn') {
+    setTimeout(function(){
+			noble.startScanning();
+		}, 1111);
+    setTimeout(function(){
+			noble.stopScanning();
+		}, 9999);
+  } else {
+    noble.stopScanning();
+  }
+});
+
+noble.on('scanStart', function(state){
+	console.log("scanStart");
+	console.log(arguments);
+});
+
+noble.on('scanStop', function(state){
+	console.log("scanStop");
+	console.log(arguments);
+});
+
+noble.on('discover', function(){
+	console.log("discover");
+	console.log(arguments);
+	var macAddr = arguments[0].address;
+	var perip_ = arguments[0];
+	discovered[macAddr] = perip_;
+	for(var i in auto){
+		if(macAddr == auto[i]){
+			connect(macAddr);
+		}
+	}
+});
+
+noble.on('warning', function(state){
+	console.log("warning");
+	console.log(arguments);
+});
+
+
+function connect(macAddress){
+
+		console.log("connecting macAddress:" + macAddress);
+		if(macAddress == null){
+			console.log("mac_address is null");
+			return;
+		} 
+
+		if(!discovered[macAddress]){
+			console.log("invalid mac_address");
+			return;
+		} else if(discovered[macAddress].state == "connected"){
+			console.log("already connected");
+			var peripheral = discovered[macAddress];
+			discoverServices(peripheral);
+			return;
+		}
+
+		var peripheral = discovered[macAddress];
+		peripheral.connect(function(error) {
+			if(error){
+	 	  	console.log(error);
+			} 
+ 		  console.log('connected to peripheral: ' + peripheral.uuid);
+			discoverServices(peripheral);
+  	});
+}
+
+
+function discoverServices(peripheral){
+	peripheral.discoverServices(null, function(error, services) {
+ 	  for (var i in services) {
+			discoverCharacteristics(services, i);
+    }
+  });
+}
+
+
+function discoverCharacteristics(services, i){
+	var service = services[i];
+	var name;
+	service.discoverCharacteristics(null, function(error, characteristics) {
+    //console.log('discovered the following characteristics:');
+    for (var j in characteristics) {
+      //console.log('service ' + i + ' uuid: ' + service.uuid + ', characteristic ' + j + ' uuid: ' + characteristics[j].uuid);
+			characteristics[j].read(function(service, i, characteristics, j){
+				return function(error_c, data){
+					if (i == 0 && j == 0) name = data;
+					
+	      	console.log('service ' + i + ' uuid: ' + service.uuid + ', characteristic ' + j + ' uuid: ' + characteristics[j].uuid + ' data: ' + data);
+
+					checkSivann(services, i, characteristics, j, data, name);
+
+					//console.log("length:" + data.length);
+					if(data.length>6)
+					console.log(" " + data.readInt8(0) + " " + data.readInt8(1) + " " + data.readFloatBE(2) + " " + data.readFloatLE(2) );
+				};
+			}(service, i, characteristics, j));
+ 	  }
+  });
+}
+
+
+
+// http://stackoverflow.com/questions/2853601/scope-of-variables-in-javascript-callback-functions
+
+
+function checkSivann(services, i, characteristics, j, data, name){
+	console.log("s0uuid:" + services[0].uuid + " c0uuid:" + characteristics[0].uuid + " name:" + name);
+
+	var s = services[i];
+	var sid = services[i].uuid;
+	var c = characteristics[j];
+	var cid = characteristics[j].uuid;
+
+	if(services[0] && services[0].uuid == "1800" && characteristics[0] && characteristics[0].uuid == "2a00" && data.indexOf("Power Meter Relay") >= 0){
+		if(s && sid == "180a" && c && cid == "2a24") console.log("relayid");
+		if(s && sid == "180a" && c && cid == "2a25") console.log("release date");
+		if(s && sid == "180a" && c && cid == "2a26") console.log("version");
+		if(s && sid == "180a" && c && cid == "2a27") console.log("version");
+		if(s && sid == "180a" && c && cid == "2a28") console.log("version");
+		if(s && sid == "180a" && c && cid == "2a29") console.log("author");
+
+		if(s && sid == "bb30" && c && cid == "cc1e") console.log("power");
+		if(s && sid == "bb30" && c && cid == "cc13") console.log("current");
+		if(s && sid == "bb30" && c && cid == "bb31") console.log("metering conf.");
+		if(s && sid == "bb30" && c && cid == "bb32") console.log("metering peri.");
+		if(s && sid == "bb40" && c && cid == "cc0e") console.log("power control");
+		if(s && sid == "bb90" && c && cid == "cc06") console.log("presence sensor");
+		if(s && sid == "bb00" && c && cid == "cc00") console.log("digital input");
+		if(s && sid == "bb10" && c && cid == "cc02") console.log("analogue input");
+		if(s && sid == "bb10" && c && cid == "bb11") console.log("AIN conf.");
+		if(s && sid == "bb10" && c && cid == "bb12") console.log("AIN peri.");
+	} else if(services[0] && services[0].uuid == "1800" && characteristics[0] && characteristics[0].uuid == "2a00" && data.indexOf("Weather Station") >= 0){
+		if(s && sid == "180a" && c && cid == "2a24") console.log("weatherstationid");
+		if(s && sid == "180a" && c && cid == "2a25") console.log("release date");
+		if(s && sid == "180a" && c && cid == "2a26") console.log("version");
+		if(s && sid == "180a" && c && cid == "2a27") console.log("version");
+		if(s && sid == "180a" && c && cid == "2a28") console.log("version");
+		if(s && sid == "180a" && c && cid == "2a29") console.log("author");
+
+		if(s && sid == "bb80" && c && cid == "cc11") console.log("barometer");
+		if(s && sid == "bb80" && c && cid == "cc07") console.log("temperature");
+		if(s && sid == "bb80" && c && cid == "bb08") console.log("humidity");
+		if(s && sid == "bb80" && c && cid == "cc05") console.log("illuminance uv index");
+		if(s && sid == "bb80" && c && cid == "cc05") console.log("illuminance lux");
+		if(s && sid == "bb80" && c && cid == "cc1a") console.log("loudness");
+		if(s && sid == "bb80" && c && cid == "cc1b") console.log("concentration");
+		if(s && sid == "bb80" && c && cid == "bb81") console.log("weather conf.");
+		if(s && sid == "bb80" && c && cid == "bb82") console.log("weather peri.");
+
+		if(s && sid == "bb90" && c && cid == "cc06") console.log("presence sensor");
+		if(s && sid == "bb00" && c && cid == "cc00") console.log("digital input");
+		if(s && sid == "bb10" && c && cid == "cc02") console.log("analogue input");
+		if(s && sid == "bb10" && c && cid == "bb11") console.log("AIN conf.");
+		if(s && sid == "bb10" && c && cid == "bb12") console.log("AIN peri.");
+	}
+
+
+}
+

@@ -11,19 +11,22 @@ var log, _rc;
 var parse = function () {
 	//console.log("in parse");
 	//console.log(arguments);
-	var first_space = arguments[0].indexOf(' ');
+
+	//TODO: accepts {api:"string",command:"string"} 
+
+	var first_space = arguments[0].indexOf('{');
 	if (first_space < 0) {
 		return {event: arguments[0], args: {}};
 	}
 
 	var event = arguments[0].substring(0, first_space);
-	var arg_string = arguments[0].substring(first_space +1);
+	var arg_string = arguments[0].substring(first_space);
 	event = event.trim();
 	arg_string = arg_string.trim();
-	//console.log("event");
-	//console.log(event);
-	//console.log("arg_string");
-	//console.log(arg_string);
+	console.log("event");
+	console.log(event);
+	console.log("arg_string");
+	console.log(arg_string);
 	var args;
 	try {
 		args = JSON.parse(arg_string);

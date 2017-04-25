@@ -1,0 +1,10 @@
+https://github.com/bluetoother/ble-webapp-boilerplate
+https://github.com/sivann-tw/hiver-iot-kit-ble.git
+
+ideas
+IOT blockchain 
+snapshot with door trigger
+temperature relay
+
+
+

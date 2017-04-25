@@ -1,0 +1,20 @@
+FROM resin/raspberrypi2-debian:latest
+# Enable systemd
+#ENV INITSYSTEM on
+# Your code goes here
+ARG USER
+ENV USER=$USER 
+RUN mkdir -pv /home/$USER /etc/sudoers.d && \
+    export uid=1000 gid=1000 && \
+    echo "${USER}:x:${uid}:${gid}:${USER},,,:/home/${USER}:/bin/bash" >> /etc/passwd && \
+    echo "${USER}:x:${uid}:" >> /etc/group && \
+    echo "${USER} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USER} && \
+    chmod 0440 /etc/sudoers.d/${USER} && \
+    chown ${uid}:${gid} -R /home/${USER} && \
+    echo "ls -l " | tee -a /etc/bash.bashrc && \
+		apt update && apt full-upgrade && apt -y install htop curl wget apt-utils && \
+		apt -y install ddd autoconf automake checkinstall build-essential raspberrypi-kernel-headers git net-tools sudo wget curl vim htop dnsutils iputils-ping mtr htop ncdu cmake jq build-essential 
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - && apt install nodejs && npm install -g http-server 
+
+
+
