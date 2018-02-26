@@ -32,11 +32,14 @@ survey package.json,
 memory_usage.js
 file uploader
 file downloader
+json-rpc 2.0
+get rid of 'var'
+
 /* to support memory usage
 */
 /* to monitor RPI's internal status
 */
-/* self_test
+/* self_test, unit test, CI
 */
 /* fuzzy: auto-adjust AC/heater
 */

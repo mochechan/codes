@@ -1,0 +1,74 @@
+
+<html>
+  <head>
+    <title>Video stream viewer</title>
+  </head>
+  <body>
+    <video id="video" controls muted>    </video> <br/>
+
+    <img id="qr">
+    
+    <img alt="verify" id=indicator> <br/>
+  
+<script>
+  let apiurl = window.location.origin + '/restifypost'
+  console.log(window.location)
+  var videoPath = window.location.search.substring(1)
+  console.log(videoPath)
+  var video = document.getElementById('video');
+  var source = document.createElement('source');
+  source.setAttribute('src', window.location.protocol + "//" +window.location.hostname + ":3000/video?path=" + videoPath);
+  //source.setAttribute('type', 'video/mp4');
+  source.setAttribute('type', 'video/mp4;codecs="avc1.42E01E, mp4a.40.2"');
+  video.appendChild(source);
+
+  //var source2 = document.createElement('source');
+  //source2.setAttribute('src', window.location.protocol + "//" +window.location.hostname + ":3000/video?path=" + videoPath+'.webm');
+  //source2.setAttribute('type', 'video/webm;codecs="vp8, vorbis"');
+  //video.appendChild(source2);
+  video.load()
+  video.play();
+//<source src="http://localhost:3000/video?path=/data/ipcams/rtsp100015855411/2017-09-09T22:19:46.198Z0000000.mp4" type="video/mp4">
+
+    var qr = document.getElementById('qr').src = 'http://api.qrserver.com/v1/create-qr-code/?data=' + window.location.protocol + "//" +window.location.hostname +':9999/html/mobilehero/viewVideo.html?' + videoPath
+
+
+fetch(apiurl,{
+  method: "POST",
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+	"jsonrpc": "2.0",
+	"api":"blackBox", 
+	"method":"",
+	"id":11,
+	"params":[],
+	"collection":"video",
+		"operator":"verify", 
+		"filename": videoPath,
+		"test":"test01", 
+		"others":{}
+})
+}).then(function(response) {
+  console.log("response:")
+  console.log(response)
+  return response.json()
+}).then(function(json) {
+  
+  console.log(json)
+  if(json.result['1'].verified === true){
+    document.getElementById('indicator').src = 'https://blogdottruecallerdotcom.files.wordpress.com/2014/01/verified_badgy.png'
+  } else {
+    document.getElementById('indicator').src = 'https://1.bp.blogspot.com/-6o2SLw62bOA/Vr0btiWnFdI/AAAAAAAAAJo/jGFBXtFFgRw/s320/notverified.png';
+  }
+})
+    
+    </script>
+  </body>
+</html>
+
+
+
+

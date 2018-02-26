@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html>
+<body>
+
+upload a file
+
+<form action="/upload" method="post" enctype="multipart/form-data">
+    Select file to upload:
+    <input type="file" name="fileToUpload" id="fileToUpload">
+</form>
+
+<strong id="test01" onclick="test01('t')">upload</strong> </br>
+<br/>
+
+<script>
+
+function test01(){
+
+console.log('uploading');
+var input = document.querySelector('input[type="file"]')
+
+var data = new FormData()
+data.append('file', input.files[0])
+data.append('user', 'hubot')
+console.log(input.files[0].name)
+
+let apiurl = window.location.origin + '/restifypost'
+
+fetch('/upload', {
+  method: 'POST',
+  body: data
+}).then(function(arg){
+  console.log('ok')
+  console.log(arg)
+  fetch(apiurl,{
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+	  "jsonrpc": "2.0",
+	  "api":"blackBox", 
+	  "method":"",
+	  "id":11,
+	  "params":[],
+	  "collection":"file",
+		"operator":"insert", 
+		"document0":{},
+		"filename":"/data/ipcams/uploads/" + input.files[0].name, 
+		"others":{}
+  })
+}).then(function(response) {
+  console.log("response:")
+  console.log(response)
+  return response.json()
+})
+})
+}  // end of function
+
+let apiurl = window.location.origin + '/restifypost'
+console.log(window.location)
+
+fetch(apiurl,{
+  method: "POST",
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+	"jsonrpc": "2.0",
+	"api":"mongodb", 
+	"method":"",
+	"id":11,
+	"params":[],
+	"collection":"file",
+		"operator":"find", 
+		"document0":{},
+		"test":"test01", 
+		"others":{}
+})
+}).then(function(response) {
+  console.log("response:")
+  console.log(response)
+  return response.json()
+}).then(function(json) {
+  let list = json.result[1]
+  console.log(list)
+
+  var table = document.getElementById("myTable");
+  for(let i in list){
+    console.log('i:')
+    console.log(list[i])
+    let item = list[i].filename.substring(21)
+
+    var row = table.insertRow(1);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2)
+    console.log(item)
+    //cell1.innerHTML = "<a href=http://localhost:9999/download/"+(item) + ">" + item + "</a>";
+    cell1.innerHTML = "<a href=/html/mobilehero/viewFile.html?"+encodeURI(item) + ">" + item + "</a>";
+    cell2.innerHTML = "" + list[i].blockNumber;
+
+    
+    
+  }
+
+})
+</script>
+
+<table id="myTable">
+  <tr>
+    <th>record data</th>
+    <th>block number</th>
+    <th></th>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+</body>
+</html>

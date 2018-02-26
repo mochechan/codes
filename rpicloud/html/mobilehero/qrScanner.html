@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html>
+  <head>
+    <title>Instascan</title>
+    <script type="text/javascript" src="instascan.min.js"></script>
+  </head>
+  <body>
+    <video id="preview"></video>
+    <script type="text/javascript">
+      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+      scanner.addListener('scan', function (content) {
+        console.log(content); 
+        // scanning result here, you can redirect to a media page. 
+        // similar behavior as an HTTP redirect
+window.location.replace(content);
+
+// similar behavior as clicking on a link
+window.location.href = content;
+      });
+      Instascan.Camera.getCameras().then(function (cameras) {
+        console.log('cameras:',cameras.length)
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]);
+        } else {
+          console.error('No cameras found.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    </script>
+  </body>
+</html>

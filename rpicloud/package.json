@@ -23,8 +23,11 @@
     "url": "https://github.com/mochechan/rpicloud.git"
   },
   "dependencies": {
+    "instascan": "^1.0.0",
+    "mongodb": "^2.2.31",
     "noble": "^1.7.0",
-    "restify": "^4.2.0",
+    "restify": "",
+    "multi-rest": "",
     "ws": "^1.1.1"
   },
   "devDependencies": {},

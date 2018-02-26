@@ -19,6 +19,16 @@ R.config({ });
 
 <strong id="test01" onclick="test01('t')">TEST01 R.emit();</strong> </br>
 
+<strong id="mongodbConnect" onclick="mongodb('connect')">mongodbConnect</strong> </br>
+<strong id="mongodbC" onclick="mongodb('insertMany')">mongodbC</strong> </br>
+<strong id="mongodbR" onclick="mongodb('find')">mongodbR</strong> </br>
+<strong id="mongodbU" onclick="mongodb('updateOne')">mongodbU</strong> </br>
+<strong id="mongodbD" onclick="mongodb('deleteOne')">mongodbD</strong> </br>
+
+<strong id="insertFile" onclick="insertFile('/data/ipcams/rtsp100015855411/2017-09-09T22:19:46.198Z0000000.mp4')">insertFile</strong> </br>
+
+<strong id="insertData" onclick="insertData('/data/ipcams/rtsp100015855411/2017-09-09T22:19:46.198Z0000000.mp4')">insertData</strong> </br>
+
 <strong id="h264-live-player" onclick="player('start_video')">start h264-live-player</strong> </br></br>
 <strong id="h264-live-player_stop" onclick="player('stop_video')">stop h264-live-player</strong> </br></br>
 <strong id="reboot" onclick="player('reboot')">reboot</strong> </br></br>
@@ -33,6 +43,86 @@ console.log("page is loaded0");
 
 	R.ws({host: window.location.host}); //enabling ws
 
+var insertFile = function (d) {
+	R.emit({"api":"blackBox", 
+		"operator":"connect", 
+		test:"test01", 
+		filename: d,
+		others:{}}, function(){
+			console.log(" callback arguments");
+			console.log(arguments);
+		});
+}
+
+var insertData = function (d) {
+	R.emit({"api":"blackBox", 
+		"operator":"connect", 
+		test:"test01", 
+		string: d,
+		others:{}}, function(){
+			console.log(" callback arguments");
+			console.log(arguments);
+		});
+}
+
+
+var mongodb = function (d) {
+	console.log('in mongodb() ' + d)
+	switch(d){
+		case 'connect':
+		console.log("in connect ")
+		R.emit({"api":"mongodb", 
+		"operator":"connect", 
+		test:"test01", 
+		others:{}}, function(){
+			console.log("mongodb callback arguments");
+			console.log(arguments);
+		});
+		break
+
+		case 'insertMany':
+		R.emit({"api":"mongodb", 
+		"operator":d, 
+		document0:[{test:"test01"}], 
+		others:{}}, function(){
+			console.log("mongodb callback arguments");
+			console.log(arguments);
+		});
+		break
+
+		case 'find':
+		R.emit({"api":"mongodb", 
+		"operator":d, 
+		document0:{}, 
+		others:{}}, function(){
+			console.log("mongodb callback arguments");
+			console.log(arguments);
+		});
+		break
+
+		case 'updateOne':
+		R.emit({"api":"mongodb", 
+		"operator":d, 
+		document0:{test:"test01"},
+		document1:{testxx:"testxx"}, 
+		others:{}}, function(){
+			console.log("mongodb callback arguments");
+			console.log(arguments);
+		});
+		break
+
+		case 'deleteOne':
+		R.emit({"api":"mongodb", 
+		"operator":d, 
+		document0:{}, 
+		others:{}}, function(){
+			console.log("mongodb callback arguments");
+			console.log(arguments);
+		});
+		break
+	}  
+} // end of mongodb
+
 	R.emit({"api":"exec","command":"ls"}, function(){
 		console.log("exec callback arguments");
 		console.log(arguments);
@@ -40,12 +130,15 @@ console.log("page is loaded0");
 
 	R.log("testing log" );
 
-var test01 = function (d) {
+var test01 = function (opt) {
 	R.emit({"api":"parse_command", "command":"demo1", test:"test01", others:{}}, function(){
 		console.log("exec callback arguments");
 		console.log(arguments);
 	});
 }
+
+
+
 
 var player = function player(d){
 	R.emit({"api":d, "command":"h264-live-player", test:"test01", others:{}}, function(result){

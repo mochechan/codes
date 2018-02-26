@@ -1,0 +1,61 @@
+<meta charset="utf-8"/>
+<html>
+  <head>
+    <title>uploaded file viewer</title>
+  </head>
+  <body>
+    <a id="file"> download file   </a> <br/>
+
+    <img id="qr">
+    
+    <img alt="verify" id=indicator> <br/>
+  
+<script>
+  let apiurl = window.location.origin + '/restifypost'
+
+  var filePath = decodeURI(window.location.search.substring(1))
+  console.log(filePath)
+  document.getElementById('file').href = '/download/'+ filePath
+//<source src="http://localhost:3000/video?path=/data/ipcams/rtsp100015855411/2017-09-09T22:19:46.198Z0000000.mp4" type="video/mp4">
+
+var qr = document.getElementById('qr').src = 'http://api.qrserver.com/v1/create-qr-code/?data=' + window.location.protocol + "//" +window.location.hostname +':9999/html/mobilehero/viewFile.html?' + encodeURI(filePath)
+
+
+fetch(apiurl,{
+  method: "POST",
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+	"jsonrpc": "2.0",
+	"api":"blackBox", 
+	"method":"",
+	"id":11,
+	"params":[],
+	"collection":"file",
+		"operator":"verify", 
+		"filename": '/data/ipcams/uploads/' + filePath, 
+		"others":{}
+})
+}).then(function(response) {
+  console.log("response:")
+  console.log(response)
+  return response.json()
+}).then(function(json) {
+  
+  console.log(json)
+  if(json.result['1'].verified === true){
+    document.getElementById('indicator').src = 'https://blogdottruecallerdotcom.files.wordpress.com/2014/01/verified_badgy.png'
+  } else {
+    document.getElementById('indicator').src = 'https://1.bp.blogspot.com/-6o2SLw62bOA/Vr0btiWnFdI/AAAAAAAAAJo/jGFBXtFFgRw/s320/notverified.png';
+  }
+})
+    
+    </script>
+  </body>
+</html>
+
+
+
+

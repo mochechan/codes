@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html>
+<body>
+
+<h1>video list</h1>
+
+<p id="demo"></p>
+
+<script>
+let apiurl = window.location.origin + '/restifypost'
+
+console.log(window.location)
+
+fetch(apiurl,{
+  method: "POST",
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+	"jsonrpc": "2.0",
+	"api":"mongodb", 
+	"method":"",
+	"id":11,
+	"params":[],
+	"collection":"video",
+	"operator":"find", 
+	"document0":{},
+	"test":"test01", 
+	"others":{}
+})
+}).then(function(response) {
+  console.log("response:")
+  console.log(response)
+  return response.json()
+}).then(function(json) {
+  let list = json.result[1]
+  console.log(list)
+
+  var table = document.getElementById("myTable");
+  for(let i in list){
+    console.log('i:')
+    console.log(list[i])
+    
+    var row = table.insertRow(1);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.innerHTML = "<a href=/html/mobilehero/viewVideo.html?"+list[i].filename + ">" + list[i].filename.substring(30,65) + "</a>";
+    cell2.innerHTML = "" + list[i].blockNumber;
+  }
+
+})
+
+</script> 
+
+<table id="myTable">
+  <tr>
+    <th>video time/name</th>
+    <th>block number</th>
+    <th></th>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+</body>
+</html> 
